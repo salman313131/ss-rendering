@@ -19,10 +19,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req,res,next)=>{
-    // User.findById('65052b880318d5430b5f760f').then(user=>{
-    //     req.user=new User(user.name,user.email,user.cart,user._id)
+    User.findById('6505aaa0a7fde68fb6fdcaa9').then(user=>{
+        req.user=user
         next()
-    // }).catch(err=>console.log(err))
+    }).catch(err=>console.log(err))
 })
 
 app.use('/admin', adminRoutes);
@@ -33,5 +33,7 @@ app.use(errorController.get404);
 
 mongoose.connect('mongodb+srv://jaan:jaankhan786@nodereact.mu2wjrq.mongodb.net/Products?retryWrites=true&w=majority')
 .then(res=>{
+    // const user = new User({name:'salman',email:'salman@gmail.com',cart:{item:[]}})
+    // user.save();
     app.listen(8000)
 }).catch(err=>console.log(err))
