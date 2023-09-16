@@ -13,16 +13,16 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const mongoConnect = require('./util/database').mongoConnect
+const mongoose = require('mongoose')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req,res,next)=>{
-    User.findById('65052b880318d5430b5f760f').then(user=>{
-        req.user=new User(user.name,user.email,user.cart,user._id)
+    // User.findById('65052b880318d5430b5f760f').then(user=>{
+    //     req.user=new User(user.name,user.email,user.cart,user._id)
         next()
-    }).catch(err=>console.log(err))
+    // }).catch(err=>console.log(err))
 })
 
 app.use('/admin', adminRoutes);
@@ -31,6 +31,7 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 
-mongoConnect(()=>{
+mongoose.connect('mongodb+srv://jaan:jaankhan786@nodereact.mu2wjrq.mongodb.net/Products?retryWrites=true&w=majority')
+.then(res=>{
     app.listen(8000)
-})
+}).catch(err=>console.log(err))

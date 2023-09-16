@@ -59,10 +59,10 @@ class User{
         .updateOne({_id:new mongodb.ObjectId(this._id)},{$set:{cart:{item:[]}}})
         }).catch(err=>console.log(err))
     }
-    // getOrder(){
-    //     const db = getDB()
-    //     return db.collection('orders').
-    // }
+    getOrder(){
+        const db = getDB()
+        return db.collection('orders').find({'user._id':new mongodb.ObjectId(this._id)}).toArray()
+    }
     static findById(userId){
         const db = getDB()
         return db.collection('users').findOne({_id:new mongodb.ObjectId(userId)})

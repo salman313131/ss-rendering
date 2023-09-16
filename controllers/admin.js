@@ -14,7 +14,12 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title,price,imageUrl,description,null,req.user._id)
+  const product = new Product({
+    title:title,
+    price:price,
+    description:description,
+    imageUrl:imageUrl
+  })
   product.save().then(r=>{
     console.log('product created')
     res.redirect('/admin/products')
@@ -27,7 +32,7 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/')
   }
   const prodId = req.params.productId
-  Product.fetchById(prodId).then(product=>{
+  Product.findById(prodId).then(product=>{
     if(!product){
       res.redirect('/');
     }
@@ -46,15 +51,20 @@ exports.postEditProduct = (req,res,next)=>{
   const updatedPrice = req.body.price
   const updatedDesc = req.body.description
   const updatedImg = req.body.imageUrl
-  const updatedProduct = new Product(updatedTitle,updatedPrice,updatedImg,updatedDesc,new objId(prodId))
-  updatedProduct.save().then(result=>{
+  Product.findById(prodId).then(product=>{
+    product.title=updatedTitle
+    product.price=updatedPrice
+    product.description=updatedDesc
+    product.imageUrl=updatedImg
+    return product.save()
+  }).then(result=>{
     console.log('product Updated')
     res.redirect('/admin/products')
   }).catch(err=>console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(products=>{
+  Product.find().then(products=>{
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
