@@ -12,10 +12,34 @@ class User{
         return db.collection('users').insertOne(this)
     }
     addToCart(product){
-        const updatedCart = {item:[{...product,quantity:1}]}
+        const cartProductIndex = this.cart.item.findIndex(cp=>cp.productId.toString() === product._id.toString())
+        let newQuantity=1
+        const updatedCartItems = [...this.cart.item]
+        if(cartProductIndex>=0){
+            newQuantity=this.cart.item[cartProductIndex].quantity+1
+            updatedCartItems[cartProductIndex].quantity = newQuantity
+        }else{
+            updatedCartItems.push({productId:product._id,quantity:newQuantity})
+        }
+        const updatedCart = {item:updatedCartItems}
         const db = getDB()
         return db.collection('users')
         .updateOne({_id:new mongodb.ObjectId(this._id)},{$set:{cart:updatedCart}})
+    }
+    getCart(){
+        const db = getDB()
+        const productsIds = this.cart.item.map(i=>i.productId)
+        return db.collection('Product').find({_id:{$in:productsIds}}).toArray().then(product=>{
+            return product.map(p=>{
+                return {...p,quantity:this.cart.item.find(i=>i.productId.toString()===p._id.toString()).quantity}
+            })
+        })
+    }
+    deleteItem(prodId){
+        const db = getDB()
+        const updatedItem = this.cart.item.filter(i=>i.productId.toString()!==prodId.toString())
+        return db.collection('users')
+        .updateOne({_id:new mongodb.ObjectId(this._id)},{$set:{cart:{item:updatedItem}}})
     }
     static findById(userId){
         const db = getDB()
